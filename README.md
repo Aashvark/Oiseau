@@ -53,7 +53,7 @@ You run functions like:
   milk();
 ```
 
-and for now you can use `#write coffee;` to print the current variable.
+and for now you can use `write coffee;` to print the current variable.
 Your file should now look like:
 ```javascript
   fun milk ~ () {
