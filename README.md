@@ -29,9 +29,7 @@ Hello World
 After writing your first Oiseau Script you will need to learn how to store variables and make functions.
 You make can make functions like so:
 ```javascript
-  fun milk ~ () {
-    
-  };
+  fun milk ~ () {};
 ```
 
 This is a pretty bland function but since it doesn't have anything in it lets add a variable:
@@ -65,4 +63,34 @@ Your file should now look like:
 This should output:
 ```log
 Perfectly done
+```
+
+# Beginner Concepts
+## Conditions
+Conditions (If you don't know already) are statements where the output only runs if the condition is true.
+As a example lets set a condition so see if apples are red:
+```javascript
+apples ~ "red";
+if apples == "red" {
+  write "Apples are red";
+};
+``` 
+If we run the file:
+```log
+Apples are red
+```
+Success!
+
+Since we can do one lets do more ! 
+```javascript
+apples ~ "red";
+if apples == "red" {
+  write true;
+};
+if apples == "blue" {
+  write false;
+};
+if apples == "green" {
+  write false;
+};
 ```
