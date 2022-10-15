@@ -87,10 +87,10 @@ apples ~ "red";
 if apples == "red" {
   write true;
 };
-if apples == "blue" {
+if apples ~~ "blue" {
   write false;
 };
-if apples == "green" {
+if apples ~= "green" {
   write false;
 };
 ```
