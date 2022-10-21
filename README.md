@@ -94,3 +94,44 @@ if apples ~= "green" {
   write false;
 };
 ```
+
+As this would work as intended lets trim it a bit by replacing some of the if statements with a elif statement.
+This makes the code cleaner and gets rid of unexepected outputs.
+
+```javascript
+apples ~ "red";
+if apples == "red" {
+  write true;
+} elif apples == "blue" {
+  write false;
+} elif apples == "green" {
+  write false;
+};
+```
+
+The result should be:
+```log
+true
+```
+
+lets add a statement if none of those apply.
+```javascript
+apples ~ "red";
+if apples == "red" {
+  write true;
+} elif apples == "blue" {
+  write false;
+} elif apples == "green" {
+  write false;
+} else {
+  write "else achieved".
+};
+```
+
+Similar to the if statement we have the while statement:
+```javascript
+while true {
+  write "Hi";
+};
+```
+but unlike the if statement you cannot chain them and they run until the condition isnt true anymore.
