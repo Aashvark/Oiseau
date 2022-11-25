@@ -6,14 +6,11 @@ from packages.Evaluator import Evaluator
 from packages.ErrorManager import SimpleError
 
 class LanguageManager:
-    def __init__(self, filename):
+    def __init__(self, filename, path):
         file   = open(filename, 'r').read()
         tokens = Lexer(file).tokens
         ast    = Parser(tokens).ast
-
-        try: Evaluator(ast)
-        except: # SimpleError("UnexpectedError", "error was unexpected") 
-            pass
+        Evaluator(ast, path)
 
 if __name__ == '__main__':
     if len(argv) == 1: SimpleError("FileError", "file wasn't given.")
@@ -28,5 +25,6 @@ if __name__ == '__main__':
         SimpleError("FileError", f"no such file or directory")
         
     if not path.rsplit('\\', 1)[1] in dirList: SimpleError("FileError", "file given doesn't exist.")
-    
-    lm = LanguageManager(argv[1])
+
+    try: lm = LanguageManager(argv[1], path.rsplit('\\', 1)[0] + '\\')
+    except KeyboardInterrupt: SimpleError("UnexpectedError", "error wasn't expected")
