@@ -1,6 +1,6 @@
 # ![Oiseau Logo](/OiseauLogoGitHub.png "Oiseau Logo")
 
-Build Oct.22a, Build: ***Stable***
+Build Nov.22b, Build: ***Stable***
 
 ### How to install Oiseau:
 #### Windows:
