@@ -5,9 +5,12 @@ class Parser:
         self.tokens = tokens
         self.ast    = []
         
-        self.global_types = ["BOOLEAN", "DECIMAL", "EMPTY", "INTEGER", "STRING", "IDENTIFIER", "OPERATOR"]
-        
+        self.global_types = ["BOOLEAN", "DECIMAL", "EMPTY", "INTEGER", "STORAGE", "STRING", "IDENTIFIER", "OPERATOR", "CALL"]
+        self.caseTypes = ["BOOLEAN", "CALL", "DECIMAL", "EMPTY", "IDENTIFIER", "INTEGER", "STORAGE", "STRING", "OPERATOR"]
+        self.numeric = ["DECIMAL", "INTEGER", "OPERATOR"]
+
         self.index = 0
+        self.caseIndex = 0
         self.buildAST()
     
     def buildAST(self):
@@ -16,14 +19,17 @@ class Parser:
             t_type = self.tokens[self.index]["type"]
             t_val  = self.tokens[self.index]["content"]
             
-            if t_type in ["COMMENT", "ATOM"]: pass
+            if t_type == "DATATYPE": self.parseExplicitVariable(stream)
             elif t_type == "IDENTIFIER": self.parseVariable(stream)
             elif t_type == "COMMAND":
                 if t_val == "fun": self.parseFunction(stream)
                 elif t_val == "if": self.parseIf(stream)
                 elif t_val == "while": self.parseWhile(stream)
+                elif t_val == "switch": self.parseSwitch(stream)
                 elif t_val == "execute": self.parseExecute(stream)
                 elif t_val == "write": self.parseWrite(stream)
+                elif t_val == "clear": self.parseClear(stream)
+                elif t_val == "delay": self.parseDelay(stream)
             elif t_type == "CALL": self.parseCall(stream)
                                 
             self.index += 1
@@ -32,24 +38,67 @@ class Parser:
         self.ast.append(ast_)
     
     def datatype(self, token):
-        if token == '': return ''
-        return {"type": token["type"], "content": token["content"]}
+        if token == '': return []
+        return token
     
-    def parseVariable(self, stream):
+    def parseExplicitVariable(self, stream):
+        name    = ""
         value   = []
         checked = 0
         
         for idx, data in enumerate(stream):
             t_type  = data["type"]
+            t_value  = data["content"]
             
             if t_type == "STATEMENT_END":
-                if idx < 3: SimpleError("StatementEndedEarlyError", "variable was ended too early.")
-                self.addAST({"module": 'var', "name": stream[0]["content"], "content": value})
+                if idx == 4: SimpleError("StatementEndedEarlyError", "variable was ended too early.")
+                if value == []:
+                    e = stream[0]["content"].upper()
+                    if e == "BOOLEAN": value = {"type": e, "content": "false"}
+                    elif e == "DECIMAL": value = {"type": e, "content": "0.0"}
+                    elif e == "INTEGER": value = {"type": e, "content": "0"}
+                    elif e == "STRING": value = {"type": e, "content": "\"\""}
+
+                self.addAST({"module": 'var', "name": name, "content": value, "type": stream[0]["content"].upper(), "const": True if stream[0]["content"][0] == '!' else False, "mod": '='})
                 checked = idx
                 break
             
             if idx == len(stream) - 1: SimpleError("StatementNotEndedError", "variable was not ended.")
-            elif idx == 1 and t_type != "ASSIGN": SimpleError("InvalidTypeError", "variable wasn't completed.")
+            elif idx == 1 and t_type != "COLON": SimpleError("InvalidTypeError", "variable wasn't completed; missing ':'")
+            elif idx == 2:
+                if t_type == "IDENTIFIER": 
+                    name = t_value
+                else: SimpleError("InvalidTypeError", "variable wasn't completed; missing '='")
+            elif idx == 3 and t_type != "ASSIGN": SimpleError("InvalidTypeError", "variable wasn't completed; missing '='")
+            elif idx >= 4:
+                if t_type in self.global_types: value.append(self.datatype(data))
+                else: SimpleError("InvalidTypeError", f"variable doesn't support {t_type}s")
+        self.index += checked
+
+    def parseVariable(self, stream):
+        value   = []
+        modif   = ''
+        isShort = False
+        checked = 0
+        
+        for idx, data in enumerate(stream):
+            t_type  = data["type"]
+            t_value  = data["content"]
+            
+            if t_type == "STATEMENT_END":
+                if not isShort and idx == 2: SimpleError("StatementEndedEarlyError", "variable was ended too early.")
+                self.addAST({"module": 'var', "name": stream[0]["content"].removeprefix('!'), "content": {"type": "EMPTY", "content": "empty"} if value == [] else value, "type": "any", "const": True if stream[0]["content"][0] == '!' else False, "mod": modif})
+                checked = idx
+                break
+            
+            if idx == len(stream) - 1: SimpleError("StatementNotEndedError", "variable was not ended.")
+            elif idx == 1:
+                if t_type == "ASSIGN": modif = t_value
+                elif t_type == "SHORT_MOD":
+                    modif = t_value[0] + '='
+                    isShort = True
+                    value = [{'type': 'INTEGER', 'content': '1'}]
+                else: SimpleError("InvalidTypeError", "variable wasn't completed.")
             elif idx >= 2:
                 if t_type in self.global_types: value.append(self.datatype(data))
                 else: SimpleError("InvalidTypeError", f"variable doesn't support {t_type}s")
@@ -162,6 +211,82 @@ class Parser:
                 else: value.append(data)
         self.index += checked
     
+    def parseSwitch(self, stream):
+        input    = ""
+        value = []
+        checked, opened = 0, 0
+        
+        for idx, data in enumerate(stream):
+            t_type  = data["type"]
+            t_value  = data["content"]
+
+            if t_type == "STATEMENT_END" and opened == 0:
+                if idx == 4: SimpleError("StatementEndedEarlyError", "switch was ended too early.")
+                self.addAST({"module": 'switch', "input": input, "cases": self.breakCases(value[:-1])})
+                checked = idx
+                break
+            
+            if idx == len(stream) - 1: SimpleError("StatementNotEndedError", "switch was not ended.")
+            elif idx == 1:
+                if t_type in self.caseTypes: input = data
+                else: SimpleError("InvalidTypeError", "switch was missing a input condition")
+            elif idx == 2:
+                if t_type != "OPEN_CURLY_BRACKET": SimpleError("InvalidTypeError", "switch wasn't opened")
+                opened += 1
+            elif idx >= 3: 
+                if t_type == "OPEN_CURLY_BRACKET": opened += 1
+                elif t_type == "CLOSE_CURLY_BRACKET": opened -= 1
+                value.append(data)
+        self.index += checked
+    
+    def breakCases(self, tokens):
+        cases = []
+        while self.caseIndex < len(tokens):
+            stream = tokens[self.caseIndex:]
+            t_type = tokens[self.caseIndex]["type"]
+            t_val  = tokens[self.caseIndex]["content"]
+
+            if t_type == "COMMAND":
+                if t_val != "case": SimpleError("NotUsedError", "case wasn't used")
+                cases.append(self.parseCase(stream))
+
+            self.caseIndex += 1
+        self.caseIndex = 0
+        return cases
+    
+    def parseCase(self, stream): 
+        name = ""
+        content = []
+        case = {"name": "", "content": []}
+        opened, checked = 0, 0
+        for idx, data in enumerate(stream):
+            t_type  = data["type"]
+            t_value  = data["content"]
+
+            if t_type == "CLOSE_CURLY_BRACKET":
+                opened -= 1
+                if opened == 0:
+                    case["name"] = name
+                    case["content"] = Parser(content).ast
+                    checked = idx
+                    break
+                opened += 1
+
+            if idx == len(stream) - 1: SimpleError("StatementNotEndedError", "the switch case was not ended.")
+            elif idx == 1:
+                if t_type in self.caseTypes: name = data
+                else: SimpleError("InvalidTypeError", "switch case wasn't given a comparasion")
+            elif idx == 2 and t_type != "COLON": SimpleError("InvalidTypeError", "switch case wasn't completed; missing ':'")
+            elif idx == 3:
+                if t_type != "OPEN_CURLY_BRACKET": SimpleError("InvalidTypeError", "switch case wasn't opened")
+                opened += 1
+            elif idx >= 4: 
+                if t_type == "OPEN_CURLY_BRACKET": opened += 1
+                elif t_type == "CLOSE_CURLY_BRACKET": opened -= 1
+                content.append(data)
+        self.caseIndex += checked
+        return case
+    
     def parseExecute(self, stream):
         value   = []
         checked = 0
@@ -200,6 +325,40 @@ class Parser:
                 else: SimpleError("InvalidTypeError", f"the write statement doesn't support {t_type}s")
         self.index += checked
     
+    def parseClear(self, stream):
+        checked = 0
+        
+        for idx, data in enumerate(stream):
+            t_type  = data["type"]
+            
+            if t_type == "STATEMENT_END":
+                self.addAST({"module": 'clear'})
+                checked = idx
+                break
+            
+            if idx >= 2: SimpleError("StatementNotEndedError", "the clear statement was not ended.")
+        self.index += checked
+
+    def parseDelay(self, stream):
+        value = []
+        checked = 0
+        
+        for idx, data in enumerate(stream):
+            t_type  = data["type"]
+            t_val  = data["content"]
+            
+            if t_type == "STATEMENT_END":
+                if idx < 2: SimpleError("StatementEndedEarlyError", "the delay statement was ended too early.")
+                self.addAST({"module": 'delay', "content": value})
+                checked = idx
+                break
+            
+            if idx == len(stream) - 1: SimpleError("StatementNotEndedError", "the delay statement was not ended.")
+            elif idx >= 1:
+                if t_type in self.numeric: value.append(data)
+                else: SimpleError("InvalidTypeError", f"the delay statement doesn't support {t_type}s")
+        self.index += checked     
+
     def parseCall(self, stream):
         checked = 0
         
