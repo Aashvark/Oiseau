@@ -34,12 +34,31 @@ Congrats you wrote your first Oiseau Program! You are on a track to learn the re
 Simple variables have two parts to it: the name and the value.
 The name of the variable, aka the identifier, is any combination of a letter followed by more letters, numbers, underscores and hyphens.
 The value is a bit more flexible as it can be any one of the datatypes listed below:
+
 Boolean - using the two words exactly as written, 'true' and 'false', to say if the state is, well, true or false.
+
 Decimal - as you can probably tell from the name, this datatype stores a decimal, this could be negitive or positive.
+
 Empty - a datatype stating that the variable doesn't have a proper value.
+
 Integer - as you can probably tell, again, from the name, this datatype stores a whole number, this could either be negitive or positive.
-String - this data type can store any string of characters. Strings must be surrounded with double-quotes, if you want to use a double quote in your string you have to escape it using '\'. Example: "\"Example\""
+
+String - this data type can store any string of characters. Strings must be surrounded with double-quotes, if you want to use a double quote in your string you have to 
+escape it using '\'. Example: "\"Example\""
+
 Storage - this datatype can store any amount of the previously mentioned datatypes. thety have to be surrounded by the greater-than and less-than signs, aka '<' and '>'.
+
+Using this knowledge we can now start making variables, you do it as shown here:
+```javascript
+  boolean ~ true;
+  decimal ~ 3.14;
+  empty_variable ~ empty;
+  integer ~ 42;
+  string ~ "Oiseau is pronounced Wa-zu";
+  storage ~ <true, 3.14, empty, 42, "Oiseau is pronounced Wa-zu">
+```
+
+notice how '~' is used in these examples, this is one of the two basic assignment operators, the other one is the equal sign, '='. These can be used in the exace same environments as each other, use either one at your will.
 
 You make can make functions like so:
 ```javascript
