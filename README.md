@@ -1,32 +1,46 @@
 # ![Oiseau Logo](/OiseauLogoGitHub.png "Oiseau Logo")
 
-Build March.23a, Build: ***Stable***
+Build March.23b, Build: ***Stable***
 
 ### How to install Oiseau:
 #### Windows:
-1. Download and run the setup file. ``OiseauSetup.exe``
+1. Download and run the setup file. ``OiseauBuild.exe``
 2. Start Creating! Have fun with Oiseau!
 
 #### Linux:
 N/A at the moment. sorry.
 
 # Getting Started:
-## Hello Oiseau!
-  Make a new folder, this is where our project will be located. Lets name it "New Folder". Lets create the main file, which will be called "main.oi".
+## Basics
+On your computer, lets make a new folder, this is where our *basic* project will be located. Lets give it a very creative name: "Hello World Test". Within the folder, create a new file, this is where all the oiseau code will be stored. This file can have a few file extensions that will work with the interpreter: '.oi', '.ois' and '.ose'. Lets use the '.oi' extension and give it a very creative name "main.oi".
 
-Lets write the well-known "Hello World":
+## Hello Oiseau!
+Now that you have your file created lets put something in it.
+Lets write the well-known, very famous "Hello World" using the 'write' keyword:
 ```javascript
   write "Hello World!";
 ```
-In order to run it use the command `oiseau main.oi`
-or go to the folder where the file is held and open it.
+Using this simple line of code we can now print things to the terminal, in this instance "Hello World!"
+
+In order to run it use the command `oiseau main.oi` in the "Hello World Test" folder or go to the folder where the file is held and open it.
 This should output:
 ```log
-Hello World
+Hello World!
 ```
 
-## Group and Assign
-After writing your first Oiseau Script you will need to learn how to store variables and make functions.
+## Assigning and Grouping
+Congrats you wrote your first Oiseau Program! You are on a track to learn the rest of the language. After writing your first Oiseau Script you will need to learn how to store variables and make functions.
+
+Simple variables have two parts to it: the name and the value.
+The name of the variable, aka the identifier, is any combination of a letter followed by more letters, numbers, underscores and hyphens.
+The value is a bit more flexible as it can be any one of the datatypes listed below:
+Boolean - using the two words exactly as written, 'true' and 'false', to say if the state is, well, true or false.
+Decimal - as you can probably tell from the name, this datatype stores a decimal, this could be negitive or positive.
+Empty - a datatype stating that the variable doesn't have a proper value.
+Integer - as you can probably tell, again, from the name, this datatype stores a whole number, this could either be negitive or positive.
+String - this data type can store any string of characters. Strings must be surrounded with double-quotes, if you want to use a double quote in your string you have to escape it using '\'. Example: "\"Example\""
+Storage - this datatype can store any amount of the previously mentioned datatypes. thety have to be surrounded by the greater-than and less-than signs, aka '<' and '>'.
+
 You make can make functions like so:
 ```javascript
   fun milk ~ () {};
