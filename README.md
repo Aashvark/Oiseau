@@ -46,7 +46,7 @@ Integer - as you can probably tell, again, from the name, this datatype stores a
 String - this data type can store any string of characters. Strings must be surrounded with double-quotes, if you want to use a double quote in your string you have to 
 escape it using '\'. Example: "\"Example\""
 
-Storage - this datatype can store any amount of the previously mentioned datatypes. thety have to be surrounded by the greater-than and less-than signs, aka '<' and '>'.
+Storage - this datatype can store any amount of the previously mentioned datatypes and something extra, KEY-VALUE PAIRS. They have to be surrounded by the greater-than and less-than signs, aka '<' and '>'.
 
 Using this knowledge we can now start making variables, you do it as shown here:
 ```javascript
@@ -55,20 +55,21 @@ Using this knowledge we can now start making variables, you do it as shown here:
   empty_variable ~ empty;
   integer ~ 42;
   string ~ "Oiseau is pronounced Wa-zu";
-  storage ~ <true, 3.14, empty, 42, "Oiseau is pronounced Wa-zu">
+  storage ~ <true, 3.14, empty, 42, "Oiseau is pronounced Wa-zu", "key": "value pairs">;
 ```
 
 notice how '~' is used in these examples, this is one of the two basic assignment operators, the other one is the equal sign, '='. These can be used in the exace same environments as each other, use either one at your will.
 
-You make can make functions like so:
+Another way to group information is functions, here you get to create a way to isolate a part of code in order to be ran anywhere, any amount of times.
+You make can initialize these functions like so:
 ```javascript
-  fun milk ~ () {};
+  fun new ~ () {};
 ```
 
 This is a pretty bland function but since it doesn't have anything in it lets add a variable:
 ```javascript
-  fun milk ~ () {
-    coffee ~ "Perfectly done";
+  fun new ~ () {
+    var ~ "Spices";
   };
 ```
 
@@ -81,21 +82,23 @@ Uh-oh it seems that we don't have a output.
 Since we haven't ran our function or used the variable at all! Lets quickly do that.
 You run functions like:
 ```javascript
-  milk();
+  new();
 ```
 
-and for now you can use `#write coffee;` to print the current variable.
+and for now you can use `write var;` to print the current variable.
 Your file should now look like:
 ```javascript
-  fun milk ~ () {
-    coffee ~ "Perfectly done";
-    write coffee;
+  fun new ~ () {
+    var ~ "Spices";
+    write var;
   };
-  milk();
+  
+  new();
 ```
+
 This should output:
 ```log
-Perfectly done
+Spices
 ```
 
 # Beginner Concepts
